@@ -2,10 +2,11 @@
   "name": "abulafia_importer",
   "version": "1.0.0",
   "description": "",
-  "main": "browser.js",
+  "main": "scripts/batch_importer.js",
   "dependencies": {
     "express": "4.16.3",
     "lodash": "4.17.11",
+    "lowdb": "1.0.0",
     "puppeteer": "1.9.0"
   },
   "devDependencies": {},
