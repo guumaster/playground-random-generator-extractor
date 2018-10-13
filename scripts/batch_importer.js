@@ -1,6 +1,7 @@
 require('events').EventEmitter.prototype._maxListeners = 1000
 
 const fetchGenerator = require('../src/loader/fetch')
+const parseContent = require('../src/parser')
 const { getDb, savePending, saveCategories } = require('../src/db')
 const { getBrowser, closeBrowser } = require('../src/loader/browser')
 
@@ -12,7 +13,7 @@ const showStats = (db) => {
   const total = db.pages.get('all').size().value()
   const pending = db.pages.get('pending').size().value()
 
-  console.log(`Processed: ${done}/${total}. Pending: ${pending} (${PROCESSED+=BATCH_SIZE})`)
+  console.log(`Processed: ${done}/${total}. Pending: ${pending} (${PROCESSED += BATCH_SIZE})`)
 }
 
 const main = async () => {
@@ -29,27 +30,21 @@ const main = async () => {
 
       batch = db.pages.get('pending').take(BATCH_SIZE).value()
 
-      const list = await Promise.all(batch.map(async name => {
-        console.log('processing', name)
-        return fetchGenerator(name)
-      }))
-
-      await list.reduce(async (promise, data) => {
-        await promise
-        if (!data.name) return
+      await Promise.all(batch.map(async name => {
+        const raw = await fetchGenerator(name)
+        const data = parseContent(raw)
+        if (!data.tables) {
+          console.error(`Empty: ${data.name}`)
+          return db.pages.get(`empty`).push(data.name).uniq().sort().write()
+        }
         return db.content.get(`tables`).push(data).write()
-        // return Promise.resolve()
-      }, Promise.resolve())
+      }))
 
       console.log('saving pending')
       await savePending()
       showStats(db)
-      //
-      // if (PROCESSED % 160 === 0) {
-      //   await closeBrowser()
-      // }
 
-    } while (batch.length )
+    } while (batch.length)
 
     await saveCategories()
     console.log('done')

@@ -9,12 +9,13 @@ const main = async () => {
     const all = db.pages.get('all').value()
     const pending = db.pages.get('pending').value()
     const excluded = db.pages.get('excluded').value()
+    const empty = db.pages.get('empty').value()
     const redirects = db.pages.get('redirects').value()
     const categories = db.pages.get('categories').keys().value()
 
     const loadedNames = db.content.get('tables').map(x => x.name).value()
 
-    const skipped = union(excluded, redirects)
+    const skipped = union(excluded, redirects, empty)
     const test = union(loadedNames, skipped).length
 
     console.log(JSON.stringify(categories.sort(), null, 2))

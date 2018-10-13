@@ -1,7 +1,10 @@
-const { savePending } = require('../src/db')
+const { getDb, savePending } = require('../src/db')
 
 const main = async () => {
   try {
+
+    const db = await getDb()
+    await db.pages.get('excluded').sort().uniq().write()
 
     await savePending()
 

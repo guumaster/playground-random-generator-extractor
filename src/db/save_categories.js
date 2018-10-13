@@ -2,7 +2,7 @@ const { map, clone, pick } = require('lodash')
 
 const getDb = require('./get_db')
 
-const groupByCategories = require('../loader/group_by_categories')
+const groupByCategories = require('./group_by_categories')
 
 module.exports = async () => {
   const db = await getDb()
