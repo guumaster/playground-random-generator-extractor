@@ -1,16 +1,24 @@
-const { pick } = require('lodash')
+const { includes, pick } = require('lodash')
 
 const { getDb } = require('../src/db')
 const groupByCategories = require('../src/db/group_by_categories')
 
+const usedBy = (db, name) => {
+  return db.content.get('tables')
+    .filter(x => includes(x.externals, name))
+    .map('name')
+    .value()
+}
+
 const main = async () => {
   try {
     const db = await getDb()
+    const TABLES = db.content.get('tables')
 
-    const noDeps = db.content.get('tables')
-      .filter(x => (x.externals && !x.externals.length))
-      .map(x => pick(x, ['name', 'lines', 'size']))
-      .sortBy(x => x.lines)
+    const noDeps = TABLES
+      .filter(x => !x.externals || !x.externals.length)
+      .map(x => ({ ...pick(x, ['name', 'lines', 'size']), usedBy: usedBy(db, x.name) }))
+      .take(10)
       .value()
 
     console.log(`Tables with no deps: `)
