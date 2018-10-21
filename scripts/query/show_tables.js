@@ -6,6 +6,8 @@ const main = async (name, tpl='main') => {
     console.log('-----------------------------------------------')
     console.log(found.tables)
     console.log('-----------------------------------------------')
+    console.log(found.tableNames.join('\n'))
+    console.log('-----------------------------------------------')
 
   } catch (e) {
     console.error(e)

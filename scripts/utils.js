@@ -39,7 +39,12 @@ const findOne = async name => {
   const TABLES = db.content.get('tables')
   const found = TABLES.find({ name }).value()
   found.uses = found.externals.length
+  found.tableNames = extractNames(found.tables)
   return usedBy(TABLES)(found)
+}
+
+const extractNames = tables => {
+  return `\n${tables}`.match(/\n;([^\n])+\n/gm).map(name => name.replace(/;/, '').trim()).sort()
 }
 
 module.exports = {
@@ -48,5 +53,6 @@ module.exports = {
   printTable,
   flattenFields,
   omitFields,
-  generate
+  generate,
+  extractNames
 }

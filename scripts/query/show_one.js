@@ -7,7 +7,7 @@ const main = async (name, tpl='main') => {
     details.name = `${details.name}\n  [${details.lines}/${details.size}]`
 
     let table = omitFields(['tables', 'lines', 'size'])(details)
-    table = flattenFields(['externals', 'usedBy', 'categories'])(table)
+    table = flattenFields(['externals', 'tableNames', 'usedBy', 'categories'])(table)
 
     console.log(printTable([ table ]))
     const samples = generate({ data: details, tpl })
