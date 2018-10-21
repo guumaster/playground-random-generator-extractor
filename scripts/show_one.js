@@ -1,32 +1,47 @@
-const { includes, omit, pick } = require('lodash')
+const { range, omit } = require('lodash')
+const rpgen = require('@rolodromo/rpgen')
 
 const { getDb } = require('../src/db')
-const groupByCategories = require('../src/db/group_by_categories')
+const usedBy = require('../src/db/used_by')
+const { noTables, flattenFields, omitFields, printTable } = require('./utils')
 
-const usedBy = (db, name) => {
-  return db.content.get('tables')
-    .filter(x => includes(x.externals, name))
-    .map('name')
-    .value()
-}
-
-const main = async (name) => {
+const main = async (name, tpl='main') => {
   try {
     const db = await getDb()
 
-    const details = db.content.get('tables')
+    const TABLES = db.content.get('tables')
+    let details = TABLES
       .find({ name })
       .value()
 
-    details.usedBy = usedBy(db, details.name)
+    const content = `;@tpl|test
+[${tpl}]
+${details.tables}`
+
+    const generator = rpgen.generator.create(content)
+
+    const samples = range(20)
+      .map(_ => generator
+        .generate()
+        .replace(/[\n|\r]+/gm, '\n')
+        .match(/.{1,135}/ig).join('\n')
+      ).join('\n')
+
     console.log('-----------------------------------------------')
     console.log(details.tables)
-    console.log(JSON.stringify(omit(details, ['tables']), null, 2))
-    console.log('done')
+    console.log('-----------------------------------------------')
+
+    details = usedBy(TABLES)(details)
+    details.name = `${details.name}\n  [${details.lines}/${details.size}]`
+    details = omitFields(['tables', 'lines', 'size'])(details)
+    details = flattenFields(['externals', 'usedBy', 'categories'])(details)
+
+    console.log(printTable([ details ]))
+    console.log(printTable([{ samples }], { colWiths: [140]}))
 
   } catch (e) {
     console.error(e)
   }
 }
 
-main(process.argv[2])
+main(process.argv[2], process.argv[3])

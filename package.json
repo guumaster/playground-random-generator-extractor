@@ -4,6 +4,8 @@
   "description": "",
   "main": "scripts/batch_importer.js",
   "dependencies": {
+    "@rolodromo/rpgen": "1.2.2",
+    "cli-table3": "0.5.1",
     "express": "4.16.3",
     "lodash": "4.17.11",
     "lowdb": "1.0.0",

@@ -1,33 +1,29 @@
-const { includes, pick } = require('lodash')
-
 const { getDb } = require('../src/db')
-const groupByCategories = require('../src/db/group_by_categories')
-
-const usedBy = (db, name) => {
-  return db.content.get('tables')
-    .filter(x => includes(x.externals, name))
-    .map('name')
-    .value()
-}
+const usedBy = require('../src/db/used_by')
+const { noTables, flattenFields, omitFields, printTable } = require('./utils')
 
 const main = async () => {
   try {
     const db = await getDb()
     const TABLES = db.content.get('tables')
+    const getUsedBy = usedBy(TABLES)
 
     const noDeps = TABLES
-      .filter(x => !x.externals || !x.externals.length)
-      .map(x => ({ ...pick(x, ['name', 'lines', 'size']), usedBy: usedBy(db, x.name) }))
-      .take(10)
+      .reject(x => x.externals.length)
+      .map(getUsedBy)
+      .sortBy('lines')
+      .reverse()
+      .map(x => {
+        x.name = `${x.name}\n  [${x.lines}/${x.size}]`
+        return x
+      })
+      .map(flattenFields(['usedBy', 'categories']))
+      .map(noTables)
+      .map(omitFields(['externals', 'lines', 'size', 'tables']))
       .value()
 
-    console.log(`Tables with no deps: `)
-    console.log(JSON.stringify(noDeps, null, 2))
-    // console.log(JSON.stringify(groupByCategories(noDeps), null, 2))
+    console.log(printTable(noDeps, { colWidths: [55, 40, 40, 4] }))
     console.log(`total: ${noDeps.length}`)
-
-
-    console.log('done')
 
   } catch (e) {
     console.error(e)
@@ -35,3 +31,4 @@ const main = async () => {
 }
 
 main()
+
