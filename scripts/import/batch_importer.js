@@ -2,7 +2,7 @@ require('events').EventEmitter.prototype._maxListeners = 1000
 
 const fetchGenerator = require('../../src/loader/fetch')
 const parseContent = require('../../src/parser')
-const { getDb, savePending, saveCategories } = require('../../src/db')
+const { getDb, savePending, saveSorted, saveCategories } = require('../../src/db')
 const { getBrowser, closeBrowser } = require('../../src/loader/browser')
 
 const BATCH_SIZE = 10
@@ -45,6 +45,8 @@ const main = async () => {
 
     } while (batch.length)
 
+    console.log('sorting')
+    await saveSorted()
     await saveCategories()
     console.log('done')
 

@@ -38,6 +38,7 @@ const findOne = async name => {
   const db = await getDb()
   const TABLES = db.content.get('tables')
   const found = TABLES.find({ name }).value()
+  found.uses = found.externals.length
   return usedBy(TABLES)(found)
 }
 

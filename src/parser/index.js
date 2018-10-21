@@ -1,7 +1,7 @@
 const extractTables = require('./extract_tables')
 const cleanCategory = require('./clean_category')
 
-const cleanCategories = cats => cats.map(cleanCategory)
+const cleanCategories = cats => cats.map(cleanCategory).sort()
 
 module.exports = ({ name, content = '' }) => {
 

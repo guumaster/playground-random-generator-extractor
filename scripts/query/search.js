@@ -16,6 +16,7 @@ const main = async (rawQuery) => {
       .map(getUsedBy)
       .map(x => {
         x.name = `${x.name}\n  [${x.lines}/${x.size}]`
+        x.uses = x.externals.length
         return x
       })
       .map(flattenFields(['categories']))
