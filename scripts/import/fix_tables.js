@@ -1,4 +1,4 @@
-const { getDb } = require('../src/db')
+const { getDb } = require('../../src/db')
 
 const main = async () => {
   try {

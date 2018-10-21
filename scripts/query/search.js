@@ -1,6 +1,6 @@
-const { getDb } = require('../src/db')
-const usedBy = require('../src/db/used_by')
-const { noTables, flattenFields, omitFields, printTable } = require('./utils')
+const { getDb } = require('../../src/db')
+const usedBy = require('../../src/db/used_by')
+const { noTables, flattenFields, omitFields, printTable } = require('../utils')
 
 const main = async (rawQuery) => {
   const query = rawQuery.toLowerCase().trim()
@@ -13,12 +13,12 @@ const main = async (rawQuery) => {
       .filter(x => {
         return x.name.toLowerCase().match(query) || x.tables.toLowerCase().match(new RegExp(`^;.*${query}`, 'im'))
       })
+      .map(getUsedBy)
       .map(x => {
         x.name = `${x.name}\n  [${x.lines}/${x.size}]`
         return x
       })
-      .map(getUsedBy)
-      .map(flattenFields(['usedBy', 'categories']))
+      .map(flattenFields(['categories']))
       .map(omitFields(['tables', 'usedBy', 'externals', 'lines', 'size', 'tables']))
       .value()
 

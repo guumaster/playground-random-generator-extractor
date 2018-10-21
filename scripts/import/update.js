@@ -1,5 +1,5 @@
 const { sort, uniq } = require('lodash')
-const { getDb, saveCategories } = require('../src/db')
+const { getDb, saveCategories } = require('../../src/db')
 
 const main = async () => {
   try {

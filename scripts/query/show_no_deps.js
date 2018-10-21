@@ -1,6 +1,6 @@
-const { getDb } = require('../src/db')
-const usedBy = require('../src/db/used_by')
-const { noTables, flattenFields, omitFields, printTable } = require('./utils')
+const { getDb } = require('../../src/db')
+const usedBy = require('../../src/db/used_by')
+const { noTables, flattenFields, omitFields, printTable } = require('../utils')
 
 const main = async () => {
   try {

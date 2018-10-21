@@ -1,4 +1,4 @@
-const { getDb, savePending } = require('../src/db')
+const { getDb, savePending } = require('../../src/db')
 
 const main = async () => {
   try {
